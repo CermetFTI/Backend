@@ -1,0 +1,23 @@
+{
+  "name": "Backend",
+  "version": "1.0.0",
+  "description": "Server-side API using node js and express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CermetFTI/Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CermetFTI/Backend/issues"
+  },
+  "homepage": "https://github.com/CermetFTI/Backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
