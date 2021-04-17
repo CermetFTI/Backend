@@ -1,0 +1,36 @@
+GET http://localhost:5000/
+
+###
+POST http://localhost:5000/auth/login
+Content-Type: application/json 
+
+{
+    "username":"mazaya",
+    "password":"accessdenied"
+}
+
+###
+POST http://localhost:5000/event
+Content-Type: application/json 
+
+{
+    "kategori":"lomba",
+    "deskripsi":"something",
+    "link":"a",
+    "poster":"a", 
+    "tanggal_buka":"1-1-1", 
+    "tanggal_tutup":"1-1-1"
+}
+
+
+###
+PUT http://localhost:5000/event/3
+Content-Type: application/json 
+
+{
+    "kategori":"lomba",
+    "deskripsi":"something"
+}
+
+###
+DELETE http://localhost:5000/event/3
