@@ -4,17 +4,43 @@ var router = express.Router();
 
 router.use(express.json(),express.urlencoded({extended:false}));
 
-router.post('/',(req,res)=>{
-    const {kategori, deskripsi, link, poster, tanggal_buka, tanggal_tutup} = req.body
-    console.log(req.user)
-    if (req.user) {
-        var sql = `INSERT INTO event 
-        (kategori, deskripsi, link, poster, tanggal_buka, tanggal_tutup, id_admin) 
-        VALUES (?,?,?,?,?,?,?)`;
-        values = [kategori, deskripsi, link, poster, tanggal_buka, tanggal_tutup, req.user.id]
+const checker = (val) =>{
+    const check = ["kategori", "deskripsi", "link", "poster", "tanggal_buka", "tanggal_tutup", "judul"]
+    for(var i=0;i<check.length;i++){
+        if(val === check[i]){
+            return true
+        }
+    }
+    return false
+}
+
+router.post('/', (req,res)=>{
+    input_data = req.body
+    input_keys = Object.keys(req.body)
+    data = input_keys.filter(x=>checker(x))
+    console.log(req.body,data)
+    values = []
+    for(var i=0;i<data.length;i++){
+        values.push(input_data[data[i]])
+    }
+    fields = ''
+    question_mark = ''
+    for(var i=0;i<data.length;i++){
+        fields+=data[i]
+        question_mark+='?'
+        if(i !== data.length-1){
+            fields+=','
+            question_mark+=','
+        }
+    }
+    var sql = `INSERT INTO event 
+    (${fields},id_admin) 
+    VALUES (${question_mark},?)`;
+    console.log(sql)
+    if (req.user) {  
         db.execute(
             sql,
-            values,
+            [...values, req.user.id],
             (err,result)=>{
                 if(err){
                     res.status(403).send(err)

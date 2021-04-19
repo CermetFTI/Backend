@@ -11,7 +11,6 @@ passport.deserializeUser(async (username,done)=>{
     try{
         const result = await db.promise().query(`SELECT * FROM user WHERE name='${username}'`);
         if (result[0][0]) {
-            console.log(result)
             done(null, result[0][0])
         }
     } catch(err) {

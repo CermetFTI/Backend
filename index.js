@@ -9,12 +9,13 @@ const PORT = process.env.PORT || 5000;
 
 app.use(session({
     secret: process.env.SECRET,
-    cookie: {maxAge:600000},
+    cookie: {maxAge:6000000},
     saveUninitialized: false,
     proxy: true,
     resave: true,
     store
 }))
+
 app.use(passport.initialize(),passport.session());
 
 // Api member
