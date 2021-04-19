@@ -1,6 +1,8 @@
 const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
+const cors =  require('cors');
+const pino = require('express-pino-logger')({prettyPrint:true});
 require('dotenv').config();
 
 const store = new session.MemoryStore();
@@ -15,6 +17,7 @@ app.use(session({
     resave: true,
     store
 }))
+app.use(cors());
 
 app.use(passport.initialize(),passport.session());
 
@@ -22,6 +25,7 @@ app.use(passport.initialize(),passport.session());
 app.use('/auth',require('./routes/auth'));
 app.use('/event',require('./routes/event'));
 app.use(express.json(),express.urlencoded({extended:false}));
+app.use(pino)
 
 app.listen(
     PORT,
