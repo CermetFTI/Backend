@@ -18,7 +18,6 @@ router.post('/', (req,res)=>{
     input_data = req.body
     input_keys = Object.keys(req.body)
     data = input_keys.filter(x=>checker(x))
-    console.log(req.body,data)
     values = []
     for(var i=0;i<data.length;i++){
         values.push(input_data[data[i]])
@@ -36,7 +35,6 @@ router.post('/', (req,res)=>{
     var sql = `INSERT INTO event 
     (${fields},id_admin) 
     VALUES (${question_mark},?)`;
-    console.log(sql)
     if (req.user) {  
         db.execute(
             sql,
@@ -86,6 +84,7 @@ router.get('/:id',(req,res)=>{
 router.put('/:id',(req,res)=>{
     update = {}
     data = req.body
+    console.log(data)
     values = []
     for(const i in req.body){
         if(data[i] !== undefined && data[i] !== null){ 
@@ -104,30 +103,39 @@ router.put('/:id',(req,res)=>{
         }
     }
     sql = `UPDATE event SET ${sentence} WHERE id=${req.params.id}`
-    db.execute(
-        sql,
-        values,
-        (err,result)=>{
-            if(err){
-                res.status(403).send(err)
-            } else {
-                res.json(result)
+    console.log(sql)
+    if(req.user){
+        db.execute(
+            sql,
+            values,
+            (err,result)=>{
+                if(err){
+                    res.status(403).send(err)
+                } else {
+                    res.json(result)
+                }
             }
-        }
-    )
+        )
+    } else {
+        res.sendStatus(403)
+    }
 })
 
 router.delete('/:id', (req,res)=>{
-    db.execute(
-        `DELETE FROM event WHERE id=${req.params.id}`,
-        (err,result)=>{
-            if(err){
-                res.status(403).send(err)
-            } else {
-                res.json(result)
+    if(req.user){
+        db.execute(
+            `DELETE FROM event WHERE id=${req.params.id}`,
+            (err,result)=>{
+                if(err){
+                    res.status(403).send(err)
+                } else {
+                    res.json(result)
+                }
             }
-        }
-    )
+        )
+    } else {
+        res.sendStatus(403)
+    }
 })
 
 module.exports = router

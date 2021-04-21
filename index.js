@@ -8,18 +8,21 @@ require('dotenv').config();
 const store = new session.MemoryStore();
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 app.use(session({
     secret: process.env.SECRET,
-    cookie: {maxAge:6000000},
-    saveUninitialized: false,
+    cookie: {maxAge:60000},
+    saveUninitialized: true,
     proxy: true,
     resave: true,
     store
 }))
-app.use(cors());
+app.use(require('cookie-parser')());
+app.use(passport.initialize(),passport.session())
 
-app.use(passport.initialize(),passport.session());
+app.use(cors({
+    origin:"http://localhost:3000",
+    credentials:true
+}),(res,req,next)=>{next()})
 
 // Api member
 app.use('/auth',require('./routes/auth'));
