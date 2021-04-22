@@ -1,6 +1,39 @@
 var express = require('express');
 const db = require('.././db');
 var router = express.Router();
+const multer = require('multer');
+const http = require("http");
+const path = require("path");
+const fs = require("fs");
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req,res,next) => {
+            next(null, './images');
+        },
+        filename: (req,file,next) => {
+            const ext = file.mimetype.split('/')[1];
+            next(null,file.fieldname + "-" + Date.now() + '-' + ext)
+        }
+    }),
+    fileFilter: (req,file,next) => {
+        if(!file){
+            next()
+        }
+        const image = file.mimetype.startsWith('image/');
+        if(image){
+            next(null,true);
+        } else {
+            next({message:"file type not supported"},file)
+        }
+    }
+});
+
+const handleError = (err, res) => {
+    res
+      .status(500)
+      .contentType("text/plain")
+      .end("Oops! Something went wrong!");
+  };
 
 router.use(express.json(),express.urlencoded({extended:false}));
 
@@ -14,7 +47,7 @@ const checker = (val) =>{
     return false
 }
 
-router.post('/', (req,res)=>{
+router.post('/', upload.single('poster'), (req,res)=>{
     input_data = req.body
     input_keys = Object.keys(req.body)
     data = input_keys.filter(x=>checker(x))
@@ -43,6 +76,13 @@ router.post('/', (req,res)=>{
                 if(err){
                     res.status(403).send(err)
                 } else {
+                    if(req.file){const tempPath = req.file.path;
+                    const targetPath = path.join(__dirname,`/images/${result.insertId}.${req.file.mimetype.split('/')[1]}`)
+                    fs.rename(tempPath, targetPath, err => {
+                        if (err) return handleError(err, res);
+                        db.execute(`UPDATE event SET poster='/${result.insertId}.${req.file.mimetype.split('/')[1]}'`,(e,r)=>{console.log(e,r)})
+                    })}
+                    console.log(result)
                     res.json(result)
                 }
             }
@@ -67,6 +107,27 @@ router.get('/',(req,res)=>{
     )
 })
 
+router.get('/some',(req,res)=>{
+    const curr_date = new Date()
+    sql = `SELECT * FROM event`;
+    db.query(
+        sql,
+        (err,result)=>{
+            if(err){
+                res.status(403).send(err)
+            } else {
+                const post_data = [];
+                for(let i=0;i<result.length;i++){
+                    if(curr_date<(new Date(result[i].tanggal_tutup))){
+                        post_data.push(result[i])
+                    }
+                }
+                res.json(post_data)
+            }
+        }
+    )
+})
+
 router.get('/:id',(req,res)=>{
     sql = `SELECT * FROM event WHERE id=${req.params.id}`;
     db.query(
@@ -81,7 +142,7 @@ router.get('/:id',(req,res)=>{
     )
 })
 
-router.put('/:id',(req,res)=>{
+router.put('/:id', upload.single('poster'), (req,res)=>{
     update = {}
     data = req.body
     console.log(data)
