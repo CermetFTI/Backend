@@ -35,7 +35,6 @@ router.post('/', (req,res)=>{
     var sql = `INSERT INTO event 
     (${fields}) 
     VALUES (${question_mark})`;
-    console.log(sql, values)
     if (req.user) {  
         db.execute(
             sql,
@@ -43,10 +42,8 @@ router.post('/', (req,res)=>{
             (err,result)=>{
                 if(err){
                     res.status(403).send(err)
-                    console.log(err)
                 } else {
                     res.json(result)
-                    console.log(result)
                 }
             }
         )

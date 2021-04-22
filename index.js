@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(session({
     secret: process.env.SECRET,
-    cookie: {maxAge:60000},
+    cookie: {maxAge:60*60*1000},
     saveUninitialized: true,
     proxy: true,
     resave: true,
@@ -22,7 +22,7 @@ app.use(passport.initialize(),passport.session())
 app.use(cors({
     origin:"http://localhost:3000",
     credentials:true
-}),(res,req,next)=>{next()})
+}))
 
 // Api member
 app.use('/auth',require('./routes/auth'));
