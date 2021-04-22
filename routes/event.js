@@ -33,12 +33,12 @@ router.post('/', (req,res)=>{
         }
     }
     var sql = `INSERT INTO event 
-    (${fields},id_admin) 
-    VALUES (${question_mark},?)`;
+    (${fields}) 
+    VALUES (${question_mark})`;
     if (req.user) {  
         db.execute(
             sql,
-            [...values, req.user.id],
+            [...values],
             (err,result)=>{
                 if(err){
                     res.status(403).send(err)
