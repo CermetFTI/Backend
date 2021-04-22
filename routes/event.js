@@ -35,7 +35,7 @@ router.post('/', (req,res)=>{
     var sql = `INSERT INTO event 
     (${fields}) 
     VALUES (${question_mark})`;
-    console.log(sql)
+    console.log(sql, values)
     if (req.user) {  
         db.execute(
             sql,
