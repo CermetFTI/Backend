@@ -74,7 +74,7 @@ router.post('/', upload.single('poster'), (req,res)=>{
             [...values],
             (err,result)=>{
                 if(err){
-                    res.status(403).send(err)
+                    res.sendStatus(404)
                 } else {
                     if(req.file){const tempPath = req.file.path;
                     const targetPath = path.join(__dirname,`/images/${result.insertId}.${req.file.mimetype.split('/')[1]}`)
@@ -82,13 +82,12 @@ router.post('/', upload.single('poster'), (req,res)=>{
                         if (err) return handleError(err, res);
                         db.execute(`UPDATE event SET poster='/${result.insertId}.${req.file.mimetype.split('/')[1]}'`,(e,r)=>{console.log(e,r)})
                     })}
-                    console.log(result)
-                    res.json(result)
+                    res.sendStatus(200)
                 }
             }
         )
     } else {
-        res.status(403).send({msg:"Not authenticated"})
+        res.sendStatus(403)
     }
     
 })
@@ -101,7 +100,11 @@ router.get('/',(req,res)=>{
             if(err){
                 res.status(403).send(err)
             } else {
-                res.json(result)
+                const post_data = [];
+                for(let i=0;i<result.length;i++){
+                    post_data.push({...result[i],tanggal_tutup: ((new Date(result[i].tanggal_tutup)+1).includes("1970") ? "-" : (new Date(result[i].tanggal_tutup)+1).slice(0,15)), tanggal_buka: ((new Date(result[i].tanggal_buka)+1).includes("1970") ? "-" : (new Date(result[i].tanggal_buka)+1).slice(0,15))})
+                }
+                res.json(post_data)
             }
         }
     )
@@ -119,7 +122,7 @@ router.get('/some',(req,res)=>{
                 const post_data = [];
                 for(let i=0;i<result.length;i++){
                     if(curr_date<(new Date(result[i].tanggal_tutup))){
-                        post_data.push(result[i])
+                        post_data.push({...result[i],tanggal_tutup: (new Date(result[i].tanggal_tutup)+1).slice(0,15), tanggal_buka: ((new Date(result[i].tanggal_buka)+1).includes("1970") ? "-" : (new Date(result[i].tanggal_buka)+1).slice(0,15))})
                     }
                 }
                 res.json(post_data)
